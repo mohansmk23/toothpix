@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
     Timer(
-        Duration(seconds: 6),
+        Duration(seconds: 8),
         () => Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (BuildContext context) => IndexScreen())));
   }
