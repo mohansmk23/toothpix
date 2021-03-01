@@ -273,6 +273,80 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
+            InkWell(
+              onTap: () {
+                //Navigator.pushNamed(context, HowToScreen.routeName);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical:0.0,horizontal: 14.0),
+                child: Container(
+                  height: 120.0,
+                  child: Stack(
+                    alignment: Alignment.bottomLeft,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 75.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12.0),
+                          boxShadow: neumorphicShadow,
+                          gradient: LinearGradient(
+                              colors: [historyCard1stColor, historyCard2ndColor]),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.0),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: -32.0,
+                                left: -32.0,
+                                child: SvgPicture.asset(
+                                  'assets/blob.svg',
+                                  height: 150.0,
+                                  width: 24.0,
+                                  color: historyCard1stColor,
+                                ),
+                              ),
+                              Positioned(
+                                right: -32.0,
+                                bottom: -32.0,
+                                child: SvgPicture.asset(
+                                  'assets/blob.svg',
+                                  height: 150.0,
+                                  width: 24.0,
+                                  color: historyCard2ndColor,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 18.0, vertical: 24.0),
+                                  child: Text(
+                                    'History of Snaps',
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20.0),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 8.0,
+                        child: SvgPicture.asset(
+                          'assets/history_illus.svg',
+                          height: 120.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
