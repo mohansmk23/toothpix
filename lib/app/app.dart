@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:toothpix/app/theme.dart';
 import 'package:toothpix/screens/dashboard_screen.dart';
+import 'package:toothpix/screens/history_details.dart';
+import 'package:toothpix/screens/history_screen.dart';
+import 'package:toothpix/screens/how_to_take_pic_screen.dart';
 import 'package:toothpix/screens/index_screen.dart';
 import 'package:toothpix/screens/login_screen.dart';
 import 'package:toothpix/screens/pic_upload_screen.dart';
 import 'package:toothpix/screens/signup_screen.dart';
 import 'package:toothpix/screens/splash_screen.dart';
-import 'package:toothpix/screens/how_to_take_pic_screen.dart';
 import 'package:toothpix/screens/thank_you.dart';
 import 'package:toothpix/screens/video_screen.dart';
 
@@ -27,6 +29,8 @@ class ToothPixApp extends StatelessWidget {
           PicUploadscreen.routeName: (context) => PicUploadscreen(),
           ThankYouScreen.routeName: (context) => ThankYouScreen(),
           VideoScreen.routeName: (context) => VideoScreen(),
+          HistoryScreen.routeName: (context) => HistoryScreen(),
+          HistoryDetails.routeName: (context) => HistoryDetails(),
         });
   }
 }

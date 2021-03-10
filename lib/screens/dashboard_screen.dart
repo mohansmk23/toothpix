@@ -5,11 +5,14 @@ import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:toothpix/screens/pic_upload_screen.dart';
-import 'package:toothpix/screens/video_screen.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'how_to_take_pic_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toothpix/app/widget_constants.dart';
+import 'package:toothpix/constants/sharedPrefKeys.dart';
+import 'package:toothpix/screens/how_to_take_pic_screen.dart';
+
+import 'history_screen.dart';
+import 'index_screen.dart';
+import 'pic_upload_screen.dart';
 
 class Dashboard extends StatefulWidget {
   static const routeName = "/dashboard";
@@ -21,15 +24,23 @@ class _DashboardState extends State<Dashboard> {
   final GlobalKey<InnerDrawerState> _innerDrawerKey =
       GlobalKey<InnerDrawerState>();
 
-  YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: '9Qa2K1CC3Hw',
-    flags: YoutubePlayerFlags(
-        autoPlay: true,
-        mute: true,
-        hideControls: true,
-        loop: true,
-        hideThumbnail: true),
-  );
+  String strFName = '', strLName = '', strAge = '', strGender = '';
+
+  getUserDetails() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    strFName = preferences.getString(fName);
+    strLName = preferences.getString(lName);
+    strAge = preferences.getInt(age).toString();
+    strGender = preferences.getString(gender);
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getUserDetails();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +55,7 @@ class _DashboardState extends State<Dashboard> {
       scale: IDOffset.horizontal(0.9),
       proportionalChildArea: true,
       borderRadius: 50,
+      leftChild: _drawerWidget(),
       leftAnimationType: InnerDrawerAnimation.static,
       rightAnimationType: InnerDrawerAnimation.quadratic,
       backgroundDecoration: BoxDecoration(
@@ -58,11 +70,6 @@ class _DashboardState extends State<Dashboard> {
         print(direction == InnerDrawerDirection.start);
       },
       innerDrawerCallback: (a) => print(a),
-      leftChild: Container(
-        child: Stack(
-          children: [],
-        ),
-      ),
       scaffold: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -73,19 +80,19 @@ class _DashboardState extends State<Dashboard> {
               },
               child: Icon(FontAwesome.bars)),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(context, PicUploadscreen.routeName);
-          },
-          label: Text('Take a pic'),
-          icon: SvgPicture.asset(
-            'assets/teeth_camera.svg',
-            height: 24.0,
-            width: 24.0,
-            color: Colors.white,
-          ),
-        ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        // floatingActionButton: FloatingActionButton.extended(
+        //   onPressed: () {
+        //     Navigator.pushNamed(context, PicUploadscreen.routeName);
+        //   },
+        //   label: Text('Take a pic'),
+        //   icon: SvgPicture.asset(
+        //     'assets/teeth_camera.svg',
+        //     height: 24.0,
+        //     width: 24.0,
+        //     color: Colors.white,
+        //   ),
+        // ),
         body: ListView(
           children: [
             SizedBox(
@@ -157,7 +164,7 @@ class _DashboardState extends State<Dashboard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'john doe',
+                                  '$strFName $strLName',
                                   style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
@@ -167,7 +174,7 @@ class _DashboardState extends State<Dashboard> {
                                   height: 8.0,
                                 ),
                                 Text(
-                                  'Male , 25 Years',
+                                  '$strGender , $strAge Years',
                                   style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w400,
@@ -183,28 +190,16 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 16.0,
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
-              child: Text(
-                'How to Take Care of your tooth?',
-                textAlign: TextAlign.left,
-                style: GoogleFonts.roboto(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20.0),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14.0),
-              child: VideoThumbnail(),
-            ),
             InkWell(
               onTap: () {
-                Navigator.pushNamed(context, HowToScreen.routeName);
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return HowToScreen(
+                        onGetStartedTap: () => Navigator.popAndPushNamed(
+                            context, PicUploadscreen.routeName),
+                      );
+                    });
               },
               child: Padding(
                 padding: const EdgeInsets.all(14.0),
@@ -245,12 +240,12 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                             Align(
-                              alignment: Alignment.centerRight,
+                              alignment: Alignment.center,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 18.0, vertical: 24.0),
                                 child: Text(
-                                  'How to Take a Good Pic ?',
+                                  'Take a ToothPix',
                                   style: GoogleFonts.roboto(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
@@ -264,8 +259,8 @@ class _DashboardState extends State<Dashboard> {
                     ),
                     Hero(
                       tag: 'howtoillus',
-                      child: SvgPicture.asset(
-                        'assets/how_to.svg',
+                      child: Image.asset(
+                        'assets/take_pic.png',
                         height: 120.0,
                       ),
                     ),
@@ -275,10 +270,11 @@ class _DashboardState extends State<Dashboard> {
             ),
             InkWell(
               onTap: () {
-                //Navigator.pushNamed(context, HowToScreen.routeName);
+                Navigator.pushNamed(context, HistoryScreen.routeName);
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical:0.0,horizontal: 14.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0.0, horizontal: 14.0),
                 child: Container(
                   height: 120.0,
                   child: Stack(
@@ -290,8 +286,10 @@ class _DashboardState extends State<Dashboard> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.0),
                           boxShadow: neumorphicShadow,
-                          gradient: LinearGradient(
-                              colors: [historyCard1stColor, historyCard2ndColor]),
+                          gradient: LinearGradient(colors: [
+                            historyCard1stColor,
+                            historyCard2ndColor
+                          ]),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
@@ -323,7 +321,7 @@ class _DashboardState extends State<Dashboard> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 18.0, vertical: 24.0),
                                   child: Text(
-                                    'History of Snaps',
+                                    'History of ToothPix',
                                     style: GoogleFonts.roboto(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w600,
@@ -347,7 +345,124 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 24.0,
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _drawerWidget() {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Spacer(),
+              Divider(
+                color: Colors.white54,
+              ),
+              _navigationMenuItem(Icons.home, 'Home', () async {
+                _toggle();
+              }),
+              Divider(
+                color: Colors.white54,
+              ),
+              _navigationMenuItem(Icons.person, 'Profile', () async {
+                _toggle();
+              }),
+              Divider(
+                color: Colors.white54,
+              ),
+              _navigationMenuItem(Icons.camera, 'Take a ToothPix', () async {
+                _toggle();
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return HowToScreen(
+                        onGetStartedTap: () => Navigator.popAndPushNamed(
+                            context, PicUploadscreen.routeName),
+                      );
+                    });
+              }),
+              Divider(
+                color: Colors.white54,
+              ),
+              _navigationMenuItem(Icons.history, 'History', () async {
+                Navigator.pushNamed(context, HistoryScreen.routeName);
+              }),
+              Divider(
+                color: Colors.white54,
+              ),
+              Spacer(),
+              _navigationMenuItem(Icons.logout, 'Logout', () {
+                _showLogoutAlertDialog(context);
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _showLogoutAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Logout"),
+      onPressed: () async {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.clear();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            IndexScreen.routeName, (Route<dynamic> route) => false);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Alert !"),
+      content: Text("Are You sure you want to logout?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Widget _navigationMenuItem(IconData icon, String txt, Function onTapMenu) {
+    return InkWell(
+      onTap: onTapMenu,
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: Colors.white,
+        ),
+        title: Text(
+          txt,
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.0,
+              decoration: TextDecoration.none),
         ),
       ),
     );
@@ -359,69 +474,5 @@ class _DashboardState extends State<Dashboard> {
         // if not set, the last direction will be used
         //InnerDrawerDirection.start OR InnerDrawerDirection.end
         direction: InnerDrawerDirection.start);
-  }
-}
-
-class VideoThumbnail extends StatelessWidget {
-  const VideoThumbnail({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          boxShadow: neumorphicShadow,
-          color: Colors.white),
-      child: Padding(
-        padding: const EdgeInsets.all(0.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Image.asset('assets/video_thumb.jpg'),
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment(0.0, -0.5),
-                          end: Alignment(0.0, 1.0),
-                          colors: [Color(0x80000000), Color(0xff000000)])),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Dental Care Tips',
-                      style: GoogleFonts.roboto(
-                          fontSize: 16.0,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500),
-                    )),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(VideoScreen.routeName);
-                      },
-                      child: Icon(
-                        Icons.play_circle_fill,
-                        color: Colors.white,
-                        size: 50.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

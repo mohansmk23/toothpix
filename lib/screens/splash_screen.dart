@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toothpix/constants/sharedPrefKeys.dart';
 import 'package:toothpix/screens/index_screen.dart';
 import 'package:video_player/video_player.dart';
+
+import 'dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = "/splashscreen";
@@ -15,6 +19,21 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   VideoPlayerController _controller;
 
+  checkLogin() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    if (preferences.getBool(isLoggedIn)) {
+      Navigator.popAndPushNamed(context, Dashboard.routeName);
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
+      // );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (BuildContext context) => IndexScreen()),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -25,10 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _controller.setLooping(true);
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
-    Timer(
-        Duration(seconds: 8),
-        () => Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => IndexScreen())));
+    Timer(Duration(seconds: 8), () => checkLogin());
   }
 
   @override
@@ -41,7 +57,13 @@ class _SplashScreenState extends State<SplashScreen> {
               Expanded(child: VideoPlayer(_controller)),
               Container(
                 width: double.infinity,
-                color: Theme.of(context).accentColor,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment(0.0, -0.5),
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[Color(0x80006BFF), Color(0xff006BFF)],
+                  ),
+                ),
                 height: MediaQuery.of(context).size.height * 0.2,
               )
             ],
@@ -51,7 +73,11 @@ class _SplashScreenState extends State<SplashScreen> {
               gradient: LinearGradient(
                 begin: Alignment(0.0, 0.1),
                 end: Alignment.bottomCenter,
-                colors: <Color>[Color(0x80006BFF), Color(0xff006BFF)],
+                colors: <Color>[
+                  Color(0x00006BFF),
+                  Color(0x80006BFF),
+                  Color(0xff006BFF)
+                ],
               ),
             ),
           ),
@@ -76,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     height: 16.0,
                   ),
                   Text(
-                    'Got A Cavity or Problem a Problem Brewing ?',
+                    'Got A Problem Brewing ?',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lato(
                       color: Colors.white,

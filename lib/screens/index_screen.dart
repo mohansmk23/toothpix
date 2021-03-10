@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:toothpix/app/theme.dart';
 import 'package:toothpix/screens/login_screen.dart';
 import 'package:toothpix/screens/signup_screen.dart';
 import 'package:toothpix/widgets/index_bezier_container.dart';
+import 'package:toothpix/widgets/login_outline_button.dart';
+import 'package:toothpix/widgets/solid_color_button.dart';
 
 class IndexScreen extends StatefulWidget {
   static const routeName = "/indexscreen";
@@ -49,8 +49,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       SizedBox(
                         height: 8.0,
                       ),
-                      Text(
-                          'Got A Cavity or Problem a Problem Brewing ? Let\'s Take a Look',
+                      Text('Got A Problem Brewing ? Let\'s Take a Look',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,
@@ -88,71 +87,6 @@ class _IndexScreenState extends State<IndexScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class LoginOutlineButton extends StatelessWidget {
-  final Color buttonColor;
-  final Color textColor;
-  final Color fillColor;
-  final String btnText;
-  final Function onTap;
-
-  const LoginOutlineButton(
-      {this.buttonColor,
-      this.textColor,
-      this.btnText,
-      this.onTap,
-      this.fillColor});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      height: 40.0,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.0),
-          side: BorderSide(color: buttonColor)),
-      onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          btnText,
-          style: TextStyle(
-              color: textColor, fontSize: 16.0, fontWeight: FontWeight.w600),
-        ),
-      ),
-      color: fillColor,
-    );
-  }
-}
-
-class SolidColorButton extends StatelessWidget {
-  final Color buttonColor;
-  final Color textColor;
-  final String btnText;
-  final Function onTap;
-
-  const SolidColorButton(
-      {this.buttonColor, this.textColor, this.btnText, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      height: 40.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          btnText,
-          style: TextStyle(
-              color: textColor, fontSize: 16.0, fontWeight: FontWeight.w600),
-        ),
-      ),
-      color: buttonColor,
     );
   }
 }

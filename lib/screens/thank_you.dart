@@ -4,11 +4,9 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:toothpix/app/widget_constants.dart';
-import 'package:toothpix/screens/dashboard_screen.dart';
+import 'package:toothpix/widgets/solid_color_button.dart';
+import 'package:toothpix/widgets/video_thumbnail.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
-import 'index_screen.dart';
 
 class ThankYouScreen extends StatefulWidget {
   static const routeName = "/thankyou";
