@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toothpix/app/theme.dart';
 import 'package:toothpix/screens/dashboard_screen.dart';
+import 'package:toothpix/screens/edit_profile.dart';
 import 'package:toothpix/screens/history_details.dart';
 import 'package:toothpix/screens/history_screen.dart';
 import 'package:toothpix/screens/how_to_take_pic_screen.dart';
@@ -31,6 +32,7 @@ class ToothPixApp extends StatelessWidget {
           VideoScreen.routeName: (context) => VideoScreen(),
           HistoryScreen.routeName: (context) => HistoryScreen(),
           HistoryDetails.routeName: (context) => HistoryDetails(),
+          ProfileScreen.routeName: (context) => ProfileScreen(),
         });
   }
 }

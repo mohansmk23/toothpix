@@ -8,6 +8,7 @@ class LoginResponse {
   int age;
   String emailId;
   String mobileNumber;
+  String profileUrl;
 
   LoginResponse(
       {this.status,
@@ -18,7 +19,8 @@ class LoginResponse {
       this.gender,
       this.age,
       this.emailId,
-      this.mobileNumber});
+      this.mobileNumber,
+      this.profileUrl});
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -30,6 +32,7 @@ class LoginResponse {
     age = json['age'];
     emailId = json['email_id'];
     mobileNumber = json['mobile_number'];
+    profileUrl = json['profile_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +46,7 @@ class LoginResponse {
     data['age'] = this.age;
     data['email_id'] = this.emailId;
     data['mobile_number'] = this.mobileNumber;
+    data['profile_url'] = this.profileUrl;
     return data;
   }
 }

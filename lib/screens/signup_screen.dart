@@ -66,6 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         preferences.setString(phoneNo, phoneNoController.text);
         preferences.setString(emailId, emailIdController.text);
         preferences.setString(authkey, parsed["auth-key"]);
+        preferences.setString(profileImgUrl, '');
         preferences.setBool(isLoggedIn, true);
 
         Navigator.pushNamedAndRemoveUntil(
@@ -233,7 +234,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       prefixIcon: Icons.vpn_key_outlined,
                       hint: 'Password',
                       inputType: TextInputType.visiblePassword,
-                      isPassword: false,
+                      isPassword: true,
                       validator: (value) {
                         if (value.isEmpty) {
                           return 'Enter Valid Password';
@@ -249,7 +250,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       prefixIcon: Icons.vpn_key_outlined,
                       hint: 'Confirm Password',
                       inputType: TextInputType.visiblePassword,
-                      isPassword: true,
+                      isPassword: false,
+                      isConfirmPass: true,
                       validator: (value) {
                         if (value.isEmpty) {
                           return 'Enter Valid Confirm Password';

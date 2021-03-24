@@ -1,7 +1,8 @@
 import 'dart:convert';
+import 'dart:core';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,8 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toothpix/backend/api_urls.dart';
 import 'package:toothpix/connection/connection.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
+import 'package:toothpix/response_models/video.dart';
 import 'package:toothpix/screens/how_to_take_pic_screen.dart';
-import 'package:toothpix/screens/thank_you.dart';
+import 'package:toothpix/screens/upload_loader_screen.dart';
 import 'package:toothpix/widgets/solid_color_button.dart';
 
 class PicUploadscreen extends StatefulWidget {
@@ -22,11 +24,13 @@ class PicUploadscreen extends StatefulWidget {
 }
 
 class _PicUploadscreenState extends State<PicUploadscreen> {
-  ImagePicker _picker = ImagePicker();
   File upperLeftImage, upperRightImage, lowerLeftImage, lowerRightImage;
   bool _isLoading = false;
+  VideoResponse videoResponse;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool _uploadImages = false;
 
   void _showSnackBar(String message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -66,8 +70,8 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
                 ),
                 InkWell(
                   onTap: () async {
-                    PickedFile pickedImage =
-                        await _picker.getImage(source: ImageSource.gallery);
+                    File pickedImage = await ImagePicker.pickImage(
+                        source: ImageSource.gallery);
 
                     image = await ImageCropper.cropImage(
                         sourcePath: pickedImage.path,
@@ -96,8 +100,8 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
                 ),
                 InkWell(
                   onTap: () async {
-                    PickedFile pickedImage =
-                        await _picker.getImage(source: ImageSource.camera);
+                    File pickedImage =
+                        await ImagePicker.pickImage(source: ImageSource.camera);
 
                     image = await ImageCropper.cropImage(
                         sourcePath: pickedImage.path,
@@ -156,28 +160,31 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
     return false;
   }
 
-  uploadAllImage() async {
+  getVideos() async {
     setState(() {
       _isLoading = true;
     });
-    FormData formData = FormData.fromMap({
-      "Top_Left": await MultipartFile.fromFile(upperLeftImage.path,
-          filename: "topleft.txt"),
-      "Top_Right": await MultipartFile.fromFile(upperRightImage.path,
-          filename: "topright.txt"),
-      "Bottom_Left": await MultipartFile.fromFile(lowerLeftImage.path,
-          filename: "bottomleft.txt"),
-      "Bottom_Right": await MultipartFile.fromFile(lowerRightImage.path,
-          filename: "bottomright.txt")
-    });
+
+    Map<String, String> params = {};
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       final response = await getDio(key: preferences.getString(authkey))
-          .post(uploadImage, data: formData);
-      final Map<String, dynamic> parsed = json.decode(response.data);
-
-      if (parsed['status'] == 'success') {
-        Navigator.pushReplacementNamed(context, ThankYouScreen.routeName);
+          .post(videoList, data: params);
+      setState(() {
+        _isLoading = false;
+      });
+      videoResponse = VideoResponse.fromJson(json.decode(response.data));
+      if (videoResponse.status == 'success') {
+        String videoDetails = jsonEncode(videoResponse);
+        preferences.setString(videoDetailsObject, videoDetails);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return HowToScreen(
+                onGetStartedTap: () => Navigator.pop(context),
+                videoResponse: videoResponse,
+              );
+            });
       } else {
         _showSnackBar('Something Went Wrong');
       }
@@ -185,6 +192,7 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
       print(e);
       _showSnackBar('Network Error');
     }
+
     setState(() {
       _isLoading = false;
     });
@@ -197,128 +205,142 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
         appBar: AppBar(
           title: Text('Take a ToothPix'),
         ),
-        body: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Spacer(),
-              Stack(
-                children: [
-                  Center(
-                    child: Image.asset(
-                      'assets/mouth.jpg',
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          UploadOpenContainer(
-                            cardColor: Color(0x80e85d04),
-                            position: 0,
-                            positionText: 'Upper Left',
-                            onTap: () async {
-                              pickImage(0);
-                              setState(() {});
-                            },
-                            isImagePicked: upperLeftImage != null,
-                            imageFile: upperLeftImage,
-                          ),
-                          UploadOpenContainer(
-                            cardColor: Color(0x8090e0ef),
-                            position: 1,
-                            positionText: 'Upper Right',
-                            onTap: () async {
-                              pickImage(1);
-                              setState(() {});
-                            },
-                            isImagePicked: upperRightImage != null,
-                            imageFile: upperRightImage,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          UploadOpenContainer(
-                            cardColor: Color(0x80fec89a),
-                            position: 2,
-                            positionText: 'Lower Left',
-                            onTap: () async {
-                              lowerLeftImage = await pickImage(2);
-                              setState(() {});
-                            },
-                            isImagePicked: lowerLeftImage != null,
-                            imageFile: lowerLeftImage,
-                          ),
-                          UploadOpenContainer(
-                            cardColor: Color(0x80bdb2ff),
-                            position: 2,
-                            positionText: 'Lower Right',
-                            onTap: () async {
-                              lowerRightImage = await pickImage(3);
-                              setState(() {});
-                            },
-                            isImagePicked: lowerRightImage != null,
-                            imageFile: lowerRightImage,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16.0,
-              ),
-              Text(
-                'Having a doubts on Capturing Pics ? ',
-                style: GoogleFonts.roboto(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16.0),
-              ),
-              InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return HowToScreen(
-                          onGetStartedTap: () => Navigator.pop(context),
-                        );
-                      });
-                },
-                child: Text(
-                  'Have a Look Here',
-                  style: GoogleFonts.roboto(
-                      color: Theme.of(context).accentColor,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16.0),
-                ),
-              ),
-              Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: SolidColorButton(
-                  buttonColor: isAllImageCaptured()
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey,
-                  textColor: Colors.white,
-                  onTap: () {
-                    if (isAllImageCaptured()) {
-                      uploadAllImage();
-                    } else {
-                      _showSnackBar('Please Capture All 4 images');
-                    }
-                  },
-                  btnText: 'Get General Advise',
-                ),
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
               )
-            ],
-          ),
-        ));
+            : Container(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Spacer(),
+                    Stack(
+                      children: [
+                        Center(
+                          child: Image.asset(
+                            'assets/mouth.jpg',
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                UploadOpenContainer(
+                                  cardColor: Color(0x80e85d04),
+                                  position: 0,
+                                  positionText: 'Upper Left',
+                                  onTap: () async {
+                                    pickImage(0);
+                                    setState(() {});
+                                  },
+                                  isImagePicked: upperLeftImage != null,
+                                  imageFile: upperLeftImage,
+                                ),
+                                UploadOpenContainer(
+                                  cardColor: Color(0x8090e0ef),
+                                  position: 1,
+                                  positionText: 'Upper Right',
+                                  onTap: () async {
+                                    pickImage(1);
+                                    setState(() {});
+                                  },
+                                  isImagePicked: upperRightImage != null,
+                                  imageFile: upperRightImage,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                UploadOpenContainer(
+                                  cardColor: Color(0x80fec89a),
+                                  position: 2,
+                                  positionText: 'Lower Left',
+                                  onTap: () async {
+                                    lowerLeftImage = await pickImage(2);
+                                    setState(() {});
+                                  },
+                                  isImagePicked: lowerLeftImage != null,
+                                  imageFile: lowerLeftImage,
+                                ),
+                                UploadOpenContainer(
+                                  cardColor: Color(0x80bdb2ff),
+                                  position: 2,
+                                  positionText: 'Lower Right',
+                                  onTap: () async {
+                                    lowerRightImage = await pickImage(3);
+                                    setState(() {});
+                                  },
+                                  isImagePicked: lowerRightImage != null,
+                                  imageFile: lowerRightImage,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 16.0,
+                    ),
+                    Text(
+                      'Having a doubts on Capturing Pics ? ',
+                      style: GoogleFonts.roboto(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16.0),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        getVideos();
+                      },
+                      child: Text(
+                        'Have a Look Here',
+                        style: GoogleFonts.roboto(
+                            color: Theme.of(context).accentColor,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16.0),
+                      ),
+                    ),
+                    Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SolidColorButton(
+                        buttonColor: isAllImageCaptured()
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey,
+                        textColor: Colors.white,
+                        onTap: () async {
+                          if (isAllImageCaptured()) {
+                            var connectivityResult =
+                                await (Connectivity().checkConnectivity());
+                            if (connectivityResult == ConnectivityResult.none) {
+                              _showSnackBar('Check Your Network');
+                            } else {
+                              var dummy = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        UploadLoader(
+                                          upperLeft: upperLeftImage,
+                                          upperRight: upperRightImage,
+                                          lowerLeft: lowerLeftImage,
+                                          lowerRight: lowerRightImage,
+                                        )),
+                              );
+                            }
+                            _showSnackBar('Something Went Wrong');
+                          } else {
+                            _showSnackBar('Please Capture All 4 images');
+                          }
+                        },
+                        btnText: 'Get General Advise',
+                      ),
+                    )
+                  ],
+                ),
+              ));
   }
 }
 
@@ -348,7 +370,7 @@ class UploadOpenContainer extends StatelessWidget {
           child: Card(
             color: cardColor,
             child: isImagePicked
-                ? Image.file(imageFile)
+                ? Hero(tag: positionText, child: Image.file(imageFile))
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

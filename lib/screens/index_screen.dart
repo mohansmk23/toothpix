@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gifimage/flutter_gifimage.dart';
 import 'package:toothpix/screens/login_screen.dart';
 import 'package:toothpix/screens/signup_screen.dart';
-import 'package:toothpix/widgets/index_bezier_container.dart';
 import 'package:toothpix/widgets/login_outline_button.dart';
 import 'package:toothpix/widgets/solid_color_button.dart';
 
@@ -12,9 +12,13 @@ class IndexScreen extends StatefulWidget {
   _IndexScreenState createState() => _IndexScreenState();
 }
 
-class _IndexScreenState extends State<IndexScreen> {
+class _IndexScreenState extends State<IndexScreen>
+    with TickerProviderStateMixin {
+  String assetName = 'assets/smilegif.gif';
+
   @override
   Widget build(BuildContext context) {
+    GifController controller = GifController(vsync: this);
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
@@ -25,14 +29,15 @@ class _IndexScreenState extends State<IndexScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 //  Icon(FontAwesome.teeth)
-
                 // BezierContainer(),
                 Expanded(
                   child: SizedBox.expand(
-                    child: BezierContainer(),
+                    child: Image.asset(
+                      assetName,
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
@@ -49,7 +54,7 @@ class _IndexScreenState extends State<IndexScreen> {
                       SizedBox(
                         height: 8.0,
                       ),
-                      Text('Got A Problem Brewing ? Let\'s Take a Look',
+                      Text('Care for your smile? Let\'s take a look',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,
@@ -57,27 +62,42 @@ class _IndexScreenState extends State<IndexScreen> {
                       SizedBox(
                         height: 38.0,
                       ),
-                      SolidColorButton(
-                        buttonColor: Colors.white,
-                        btnText: 'Log in',
-                        textColor: Theme.of(context).primaryColor,
-                        onTap: () {
-                          Navigator.of(context)
-                              .pushNamed(LoginScreen.routeName);
-                        },
-                      ),
-                      SizedBox(
-                        height: 16.0,
-                      ),
-                      LoginOutlineButton(
-                        buttonColor: Colors.white,
-                        btnText: 'Sign up',
-                        textColor: Colors.white,
-                        fillColor: Theme.of(context).primaryColor,
-                        onTap: () {
-                          Navigator.of(context)
-                              .pushNamed(SignUpScreen.routeName);
-                        },
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SolidColorButton(
+                              buttonColor: Colors.white,
+                              btnText: 'Log in',
+                              textColor: Theme.of(context).primaryColor,
+                              onTap: () async {
+                                setState(() {
+                                  assetName = 'assets/smileimg.jpg';
+                                });
+
+                                var dummy = await Navigator.of(context)
+                                    .pushNamed(LoginScreen.routeName);
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            width: 16.0,
+                          ),
+                          Expanded(
+                            child: LoginOutlineButton(
+                              buttonColor: Colors.white,
+                              btnText: 'Sign up',
+                              textColor: Colors.white,
+                              fillColor: Theme.of(context).primaryColor,
+                              onTap: () {
+                                setState(() {
+                                  assetName = 'assets/smileimg.jpg';
+                                });
+                                Navigator.of(context)
+                                    .pushNamed(SignUpScreen.routeName);
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -22,11 +22,14 @@ class _SplashScreenState extends State<SplashScreen> {
   checkLogin() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    if (preferences.getBool(isLoggedIn)) {
-      Navigator.popAndPushNamed(context, Dashboard.routeName);
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
-      // );
+    print(preferences.getBool(isLoggedIn));
+    print(preferences.getBool(isLoggedIn).toString());
+
+    if (preferences.getBool(isLoggedIn) ?? false) {
+      //Navigator.popAndPushNamed(context, Dashboard.routeName);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
+      );
     } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (BuildContext context) => IndexScreen()),
@@ -38,13 +41,15 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.asset('assets/introvideo.mp4');
+    _controller = VideoPlayerController.asset('assets/introvideo.mp4',
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
 
     _controller.addListener(() {});
     _controller.setLooping(true);
+    _controller.setVolume(0);
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
-    Timer(Duration(seconds: 8), () => checkLogin());
+    Timer(Duration(seconds: 4), () => checkLogin());
   }
 
   @override
@@ -87,36 +92,20 @@ class _SplashScreenState extends State<SplashScreen> {
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.2,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(
-                    height: 16.0,
-                  ),
                   Image.asset(
                     'assets/logo_white.png',
                     width: 40.0,
                     height: 40.0,
                   ),
-                  SizedBox(
-                    height: 16.0,
-                  ),
                   Text(
-                    'Got A Problem Brewing ?',
+                    'Got A Problem Brewing ? Let\'s Take a Look',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lato(
                       color: Colors.white,
                     ),
-                  ),
-                  Text(
-                    'Let\'s Take a Look',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 24.0,
                   ),
                   Image.asset(
                     'assets/introloader.gif',

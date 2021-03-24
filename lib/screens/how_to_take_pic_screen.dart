@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:toothpix/response_models/video.dart';
 import 'package:toothpix/widgets/solid_color_button.dart';
 import 'package:toothpix/widgets/video_thumbnail.dart';
 
@@ -8,8 +9,9 @@ class HowToScreen extends StatelessWidget {
   static const routeName = "/howto";
 
   final Function onGetStartedTap;
+  final VideoResponse videoResponse;
 
-  const HowToScreen({this.onGetStartedTap});
+  const HowToScreen({this.onGetStartedTap, this.videoResponse});
 
   @override
   Widget build(BuildContext context) {
@@ -139,17 +141,21 @@ class HowToScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14.0, vertical: 2.0),
                     child: Text(
-                      'How to Take a pic your tooth?',
+                      'How to take a good picture of your tooth?',
                       textAlign: TextAlign.left,
                       style: GoogleFonts.roboto(
                           color: Colors.black54,
                           fontWeight: FontWeight.w800,
-                          fontSize: 20.0),
+                          fontSize: 16.0),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(14.0),
-                    child: VideoThumbnail(),
+                    child: VideoThumbnail(
+                      videoImg: videoResponse.takePick.thumbnailImage,
+                      videoUrl: videoResponse.takePick.url,
+                      videoName: videoResponse.takePick.title,
+                    ),
                   ),
                 ],
               ),

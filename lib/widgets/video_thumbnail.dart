@@ -27,7 +27,7 @@ class VideoThumbnail extends StatelessWidget {
               AspectRatio(
                 aspectRatio: 16 / 9,
                 child: Image.network(
-                  'https:\/\/dev.hirephpcoder.com\/toothpix\/backend\/web\/uploads\/vlEoSZm.jpg',
+                  videoImg,
                   fit: BoxFit.fill,
                 ),
               ),
@@ -48,7 +48,7 @@ class VideoThumbnail extends StatelessWidget {
                   children: [
                     Expanded(
                         child: Text(
-                      'Dental Care Tips',
+                      videoName,
                       style: GoogleFonts.roboto(
                           fontSize: 16.0,
                           color: Colors.white,
@@ -56,7 +56,13 @@ class VideoThumbnail extends StatelessWidget {
                     )),
                     InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(VideoScreen.routeName);
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (BuildContext context) => VideoScreen(
+                                    videoId: videoUrl,
+                                    videoName: videoName,
+                                  )),
+                        );
                       },
                       child: Icon(
                         Icons.play_circle_fill,

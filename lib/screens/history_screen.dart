@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -92,7 +93,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
               Tab(
-                child: Text('Recommended'),
+                child: Text(
+                  'Recommended',
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               Tab(
                 child: Text('Pending'),

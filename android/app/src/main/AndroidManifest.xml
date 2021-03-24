@@ -11,8 +11,10 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="toothpix"
-        android:icon="@mipmap/ic_launcher">
+        android:label="ToothPix"
+        android:icon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

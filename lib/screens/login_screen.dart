@@ -52,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         preferences.setString(phoneNo, loginResponse.mobileNumber);
         preferences.setString(emailId, loginResponse.emailId);
         preferences.setString(authkey, loginResponse.authKey);
+        preferences.setString(profileImgUrl, loginResponse.profileUrl);
         preferences.setBool(isLoggedIn, true);
 
         Navigator.pushNamedAndRemoveUntil(
@@ -72,11 +73,12 @@ class _LoginScreenState extends State<LoginScreen> {
         key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.end,
+          child: ListView(
+            padding: EdgeInsets.all(0),
             children: [
-              Expanded(child: LoginBanner()),
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: LoginBanner()),
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Form(
@@ -92,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         inputType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Please enter valid username';
+                            return 'Enter valid Email ID';
                           } else {
                             userName = value;
                           }
@@ -109,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         isPassword: true,
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Please enter valid username';
+                            return 'Enter valid Password';
                           } else {
                             passWord = value;
                           }
@@ -228,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class LoginFormField extends StatelessWidget {
+class LoginFormField extends StatefulWidget {
   final String hint;
   final IconData prefixIcon;
   final bool isPassword;
@@ -237,6 +239,7 @@ class LoginFormField extends StatelessWidget {
   final TextInputType inputType;
   final bool isAge;
   final bool isMobile;
+  final bool isConfirmPass;
 
   const LoginFormField(
       {this.hint,
@@ -246,17 +249,30 @@ class LoginFormField extends StatelessWidget {
       this.controller,
       this.isAge = false,
       this.isMobile = false,
+      this.isConfirmPass = false,
       this.inputType});
+
+  @override
+  _LoginFormFieldState createState() => _LoginFormFieldState();
+}
+
+class _LoginFormFieldState extends State<LoginFormField> {
+  bool _passwordVisible = false;
+
+  @override
+  void initState() {
+    _passwordVisible = false;
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
+      controller: widget.controller,
       style: TextStyle(color: Theme.of(context).primaryColor),
-      keyboardType: inputType,
-      maxLength: isAge
+      keyboardType: widget.inputType,
+      maxLength: widget.isAge
           ? 2
-          : isMobile
+          : widget.isMobile
               ? 10
               : null,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
@@ -266,14 +282,32 @@ class LoginFormField extends StatelessWidget {
             borderSide: const BorderSide(color: Colors.grey, width: 2.0),
           ),
           fillColor: Colors.grey,
-          hintText: hint,
+          hintText: widget.hint,
           hintStyle: TextStyle(color: Colors.grey),
           prefixIcon: Icon(
-            prefixIcon,
+            widget.prefixIcon,
           ),
-          suffixIcon: isPassword ? Icon(FontAwesome.eye) : null),
-      obscureText: isPassword,
-      validator: validator,
+          suffixIcon: widget.isPassword
+              ? IconButton(
+                  icon: Icon(
+                    // Based on passwordVisible state choose the icon
+                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Theme.of(context).primaryColorDark,
+                  ),
+                  onPressed: () {
+                    // Update the state i.e. toogle the state of passwordVisible variable
+                    setState(() {
+                      _passwordVisible = !_passwordVisible;
+                    });
+                  },
+                )
+              : null),
+      obscureText: widget.isPassword
+          ? !_passwordVisible
+          : widget.isConfirmPass
+              ? true
+              : false,
+      validator: widget.validator,
     );
   }
 }

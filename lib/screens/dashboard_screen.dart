@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -7,7 +9,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toothpix/app/widget_constants.dart';
+import 'package:toothpix/backend/api_urls.dart';
+import 'package:toothpix/connection/connection.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
+import 'package:toothpix/response_models/video.dart';
+import 'package:toothpix/screens/edit_profile.dart';
 import 'package:toothpix/screens/how_to_take_pic_screen.dart';
 
 import 'history_screen.dart';
@@ -24,7 +30,21 @@ class _DashboardState extends State<Dashboard> {
   final GlobalKey<InnerDrawerState> _innerDrawerKey =
       GlobalKey<InnerDrawerState>();
 
-  String strFName = '', strLName = '', strAge = '', strGender = '';
+  String strFName = '',
+      strLName = '',
+      strAge = '',
+      strGender = '',
+      strProfileImg = '';
+  VideoResponse videoResponse;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = false;
+
+  void _showSnackBar(String message) {
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
 
   getUserDetails() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -33,13 +53,55 @@ class _DashboardState extends State<Dashboard> {
     strLName = preferences.getString(lName);
     strAge = preferences.getInt(age).toString();
     strGender = preferences.getString(gender);
+    strProfileImg = preferences.getString(profileImgUrl);
 
     setState(() {});
+  }
+
+  getVideos() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    Map<String, String> params = {};
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      final response = await getDio(key: preferences.getString(authkey))
+          .post(videoList, data: params);
+      setState(() {
+        _isLoading = false;
+      });
+      videoResponse = VideoResponse.fromJson(json.decode(response.data));
+      if (videoResponse.status == 'success') {
+        String videoDetails = jsonEncode(videoResponse);
+        preferences.setString(videoDetailsObject, videoDetails);
+
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return HowToScreen(
+                onGetStartedTap: () => Navigator.popAndPushNamed(
+                    context, PicUploadscreen.routeName),
+                videoResponse: videoResponse,
+              );
+            });
+      } else {
+        _showSnackBar('Something Went Wrong');
+      }
+    } catch (e) {
+      print(e);
+      _showSnackBar('Network Error');
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   void initState() {
     getUserDetails();
+    // getVideos();
   }
 
   @override
@@ -71,6 +133,7 @@ class _DashboardState extends State<Dashboard> {
       },
       innerDrawerCallback: (a) => print(a),
       scaffold: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('ToothPix'),
@@ -93,204 +156,34 @@ class _DashboardState extends State<Dashboard> {
         //     color: Colors.white,
         //   ),
         // ),
-        body: ListView(
-          children: [
-            SizedBox(
-              height: 8.0,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14.0),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: neumorphicShadow,
-                  gradient: LinearGradient(colors: [
-                    Theme.of(context).accentColor,
-                    Theme.of(context).primaryColor
-                  ]),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: -32.0,
-                        left: -32.0,
-                        child: SvgPicture.asset(
-                          'assets/blob.svg',
-                          height: 150.0,
-                          width: 24.0,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
-                      Positioned(
-                        right: -32.0,
-                        bottom: -32.0,
-                        child: SvgPicture.asset(
-                          'assets/blob.svg',
-                          height: 150.0,
-                          width: 24.0,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 75.0,
-                              height: 75.0,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipOval(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SvgPicture.asset(
-                                    'assets/man_avatar.svg',
-                                    width: 50.0,
-                                    height: 50.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 16.0,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '$strFName $strLName',
-                                  style: GoogleFonts.roboto(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 22.0),
-                                ),
-                                SizedBox(
-                                  height: 8.0,
-                                ),
-                                Text(
-                                  '$strGender , $strAge Years',
-                                  style: GoogleFonts.roboto(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16.0),
-                                )
-                              ],
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView(
+                children: [
+                  SizedBox(
+                    height: 8.0,
                   ),
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return HowToScreen(
-                        onGetStartedTap: () => Navigator.popAndPushNamed(
-                            context, PicUploadscreen.routeName),
-                      );
-                    });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: Stack(
-                  alignment: Alignment.bottomLeft,
-                  children: [
-                    Container(
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Container(
                       width: double.infinity,
-                      height: 75.0,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.0),
                         boxShadow: neumorphicShadow,
-                        gradient: LinearGradient(
-                            colors: [howToCard1stColor, howToCard2ndColor]),
+                        gradient: LinearGradient(colors: [
+                          Theme.of(context).accentColor,
+                          Theme.of(context).primaryColor
+                        ]),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12.0),
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              top: -32.0,
-                              left: -32.0,
-                              child: SvgPicture.asset(
-                                'assets/blob.svg',
-                                height: 150.0,
-                                width: 24.0,
-                                color: howToCard1stColor,
-                              ),
-                            ),
-                            Positioned(
-                              right: -32.0,
-                              bottom: -32.0,
-                              child: SvgPicture.asset(
-                                'assets/blob.svg',
-                                height: 150.0,
-                                width: 24.0,
-                                color: howToCard1stColor,
-                              ),
-                            ),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 18.0, vertical: 24.0),
-                                child: Text(
-                                  'Take a ToothPix',
-                                  style: GoogleFonts.roboto(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20.0),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Hero(
-                      tag: 'howtoillus',
-                      child: Image.asset(
-                        'assets/take_pic.png',
-                        height: 120.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, HistoryScreen.routeName);
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0.0, horizontal: 14.0),
-                child: Container(
-                  height: 120.0,
-                  child: Stack(
-                    alignment: Alignment.bottomLeft,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 75.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: neumorphicShadow,
-                          gradient: LinearGradient(colors: [
-                            historyCard1stColor,
-                            historyCard2ndColor
-                          ]),
-                        ),
+                      child: InkWell(
+                        onTap: () async {
+                          var dummy = await Navigator.pushNamed(
+                              context, ProfileScreen.routeName);
+
+                          getUserDetails();
+                        },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Stack(
@@ -302,7 +195,7 @@ class _DashboardState extends State<Dashboard> {
                                   'assets/blob.svg',
                                   height: 150.0,
                                   width: 24.0,
-                                  color: historyCard1stColor,
+                                  color: Theme.of(context).accentColor,
                                 ),
                               ),
                               Positioned(
@@ -312,44 +205,221 @@ class _DashboardState extends State<Dashboard> {
                                   'assets/blob.svg',
                                   height: 150.0,
                                   width: 24.0,
-                                  color: historyCard2ndColor,
+                                  color: Theme.of(context).accentColor,
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 18.0, vertical: 24.0),
-                                  child: Text(
-                                    'History of ToothPix',
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20.0),
-                                  ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.blueAccent,
+                                      ),
+                                      width: 75,
+                                      height: 75.0,
+                                      child: ClipOval(
+                                          child: strProfileImg.isNotEmpty
+                                              ? Image.network(
+                                                  strProfileImg,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : SvgPicture.asset(
+                                                  'assets/man_avatar.svg')),
+                                    ),
+                                    SizedBox(
+                                      width: 16.0,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '$strFName $strLName',
+                                          style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 22.0),
+                                        ),
+                                        SizedBox(
+                                          height: 8.0,
+                                        ),
+                                        Text(
+                                          '$strGender , $strAge Years',
+                                          style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16.0),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
                       ),
-                      Positioned(
-                        right: 8.0,
-                        child: SvgPicture.asset(
-                          'assets/history_illus.svg',
-                          height: 120.0,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      getVideos();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Stack(
+                        alignment: Alignment.bottomLeft,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 75.0,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.0),
+                              boxShadow: neumorphicShadow,
+                              gradient: LinearGradient(colors: [
+                                howToCard1stColor,
+                                howToCard2ndColor
+                              ]),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    top: -32.0,
+                                    left: -32.0,
+                                    child: SvgPicture.asset(
+                                      'assets/blob.svg',
+                                      height: 150.0,
+                                      width: 24.0,
+                                      color: howToCard1stColor,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: -32.0,
+                                    bottom: -32.0,
+                                    child: SvgPicture.asset(
+                                      'assets/blob.svg',
+                                      height: 150.0,
+                                      width: 24.0,
+                                      color: howToCard1stColor,
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 18.0, vertical: 24.0),
+                                      child: Text(
+                                        'Take a ToothPix',
+                                        style: GoogleFonts.roboto(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20.0),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Hero(
+                            tag: 'howtoillus',
+                            child: Image.asset(
+                              'assets/take_pic.png',
+                              height: 120.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, HistoryScreen.routeName);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0.0, horizontal: 14.0),
+                      child: Container(
+                        height: 120.0,
+                        child: Stack(
+                          alignment: Alignment.bottomLeft,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 75.0,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                boxShadow: neumorphicShadow,
+                                gradient: LinearGradient(colors: [
+                                  historyCard1stColor,
+                                  historyCard2ndColor
+                                ]),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12.0),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      top: -32.0,
+                                      left: -32.0,
+                                      child: SvgPicture.asset(
+                                        'assets/blob.svg',
+                                        height: 150.0,
+                                        width: 24.0,
+                                        color: historyCard1stColor,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: -32.0,
+                                      bottom: -32.0,
+                                      child: SvgPicture.asset(
+                                        'assets/blob.svg',
+                                        height: 150.0,
+                                        width: 24.0,
+                                        color: historyCard2ndColor,
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 18.0, vertical: 24.0),
+                                        child: Text(
+                                          'History of ToothPix',
+                                          style: GoogleFonts.roboto(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 20.0),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 8.0,
+                              child: SvgPicture.asset(
+                                'assets/history_illus.svg',
+                                height: 110.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    height: 24.0,
+                  ),
+                ],
               ),
-            ),
-            SizedBox(
-              height: 24.0,
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -375,7 +445,10 @@ class _DashboardState extends State<Dashboard> {
                 color: Colors.white54,
               ),
               _navigationMenuItem(Icons.person, 'Profile', () async {
-                _toggle();
+                var dummy =
+                    await Navigator.pushNamed(context, ProfileScreen.routeName);
+
+                getUserDetails();
               }),
               Divider(
                 color: Colors.white54,
@@ -389,6 +462,7 @@ class _DashboardState extends State<Dashboard> {
                       return HowToScreen(
                         onGetStartedTap: () => Navigator.popAndPushNamed(
                             context, PicUploadscreen.routeName),
+                        videoResponse: videoResponse,
                       );
                     });
               }),

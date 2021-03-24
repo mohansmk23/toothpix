@@ -106,6 +106,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               padding: const EdgeInsets.all(8.0),
               child: SafeArea(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -161,114 +162,119 @@ class HistoryDetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: neumorphicShadow,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AspectRatio(
-                      aspectRatio: 1,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(16.0),
-                              topRight: Radius.circular(16.0)),
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Image.network(
-                                  imgUrl,
-                                  fit: BoxFit.fill,
+    final _scrollController = ScrollController();
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: neumorphicShadow,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+                aspectRatio: 1,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0)),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Image.network(
+                            imgUrl,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        Positioned(
+                          top: 16.0,
+                          right: 8.0,
+                          child: ClipOval(
+                            child: Container(
+                              color: Colors.black.withOpacity(0.25),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  position,
+                                  style: GoogleFonts.sourceSansPro(
+                                      fontSize: 24.0, color: Colors.white),
                                 ),
                               ),
-                              Positioned(
-                                top: 16.0,
-                                right: 8.0,
-                                child: ClipOval(
-                                  child: Container(
-                                    color: Colors.black.withOpacity(0.25),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        position,
-                                        style: GoogleFonts.sourceSansPro(
-                                            fontSize: 24.0,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ))),
-                  SizedBox(
-                    height: 16.0,
-                  ),
-                  status == RecommendationStatus.pending
-                      ? PendingApprovalIndicator()
-                      : Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
+                            ),
+                          ),
+                        )
+                      ],
+                    ))),
+            SizedBox(
+              height: 16.0,
+            ),
+            status == RecommendationStatus.pending
+                ? PendingApprovalIndicator()
+                : Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  ProblemIndicator(
-                                    type: ProblemType.cavity,
-                                    result: isCavity
-                                        ? ProblemResult.positive
-                                        : ProblemResult.negative,
-                                  ),
-                                  SizedBox(
-                                    width: 16.0,
-                                  ),
-                                  ProblemIndicator(
-                                    type: ProblemType.filling,
-                                    result: isFilling
-                                        ? ProblemResult.positive
-                                        : ProblemResult.negative,
-                                  ),
-                                ],
+                              ProblemIndicator(
+                                type: ProblemType.cavity,
+                                result: isCavity
+                                    ? ProblemResult.positive
+                                    : ProblemResult.negative,
                               ),
                               SizedBox(
-                                height: 16.0,
+                                width: 16.0,
                               ),
-                              Text(
-                                'Recommendation',
-                                style: GoogleFonts.sourceSansPro(
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              SizedBox(
-                                height: 2.0,
-                              ),
-                              Text(
-                                recommendation.isEmpty
-                                    ? 'No Recommendation'
-                                    : recommendation,
-                                style:
-                                    GoogleFonts.sourceSansPro(fontSize: 15.0),
+                              ProblemIndicator(
+                                type: ProblemType.filling,
+                                result: isFilling
+                                    ? ProblemResult.positive
+                                    : ProblemResult.negative,
                               ),
                             ],
                           ),
-                        )
-                ],
-              ),
-            ),
-          ),
+                          SizedBox(
+                            height: 16.0,
+                          ),
+                          Text(
+                            'Recommendation',
+                            style: GoogleFonts.sourceSansPro(
+                                fontSize: 12.0, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(
+                            height: 2.0,
+                          ),
+                          Expanded(
+                            child: Scrollbar(
+                              isAlwaysShown: true,
+                              controller: _scrollController,
+                              child: SingleChildScrollView(
+                                controller: _scrollController,
+                                child: Text(
+                                  recommendation.isEmpty
+                                      ? 'No Recommendation'
+                                      : recommendation,
+                                  style:
+                                      GoogleFonts.sourceSansPro(fontSize: 15.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -340,47 +346,57 @@ class ProblemIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: result == ProblemResult.positive
-          ? Colors.red[100]
-          : Colors.green[100],
-      child: Row(
-        children: [
-          Container(
-            height: 28.0,
-            width: 6.0,
-            decoration: BoxDecoration(
-              color:
-                  result == ProblemResult.positive ? Colors.red : Colors.green,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-          ),
-          SizedBox(
-            width: 4.0,
-          ),
-          SvgPicture.asset(
-            type == ProblemType.filling
-                ? 'assets/tooth-filling.svg'
-                : 'assets/cavity.svg',
-            color: result == ProblemResult.positive ? Colors.red : Colors.green,
-            width: 20.0,
-            height: 20.0,
-          ),
-          SizedBox(
-            width: 4.0,
-          ),
-          Text(
-            getProblemText(),
-            style: GoogleFonts.sourceSansPro(
+    return Expanded(
+      child: Container(
+        color: result == ProblemResult.positive
+            ? Colors.red[100]
+            : Colors.green[100],
+        child: Row(
+          children: [
+            Container(
+              height: 28.0,
+              width: 6.0,
+              decoration: BoxDecoration(
                 color: result == ProblemResult.positive
                     ? Colors.red
                     : Colors.green,
-                fontSize: 12.0),
-          ),
-          SizedBox(
-            width: 16.0,
-          ),
-        ],
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+            ),
+            SizedBox(
+              width: 4.0,
+            ),
+            SvgPicture.asset(
+              type == ProblemType.filling
+                  ? 'assets/tooth-filling.svg'
+                  : 'assets/cavity.svg',
+              color:
+                  result == ProblemResult.positive ? Colors.red : Colors.green,
+              width: 20.0,
+              height: 20.0,
+            ),
+            SizedBox(
+              width: 4.0,
+            ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  getProblemText(),
+                  overflow: TextOverflow.clip,
+                  style: GoogleFonts.sourceSansPro(
+                      color: result == ProblemResult.positive
+                          ? Colors.red
+                          : Colors.green,
+                      fontSize: 12.0),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 16.0,
+            ),
+          ],
+        ),
       ),
     );
   }
