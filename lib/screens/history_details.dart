@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,10 +106,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: SafeArea(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: ListView(
+                  shrinkWrap: true,
                   children: [
                     HistoryDetailsDateCard(
                         recommendDate: widget.recommendDate,
@@ -117,7 +116,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                     SizedBox(
                       height: 24.0,
                     ),
-                    Expanded(
+                    Container(
+                      height: MediaQuery.of(context).size.width + 72 + 200,
                       child: PageView.builder(
                         itemCount: 4,
                         controller: _pageController,
@@ -126,13 +126,13 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                               historyDetailsResponse.imageDetails[index];
 
                           return HistoryDetailsCard(
-                            position: _getPositionNameFromIndex(index),
-                            isCavity: imageData.cavity == 'Yes',
-                            isFilling: imageData.brokenFiling == 'Yes',
-                            recommendation: imageData.comments,
-                            imgUrl: imageData.url,
-                            status: widget.status,
-                          );
+                              position: _getPositionNameFromIndex(index),
+                              isCavity: imageData.cavity == 'Yes',
+                              isFilling: imageData.brokenFiling == 'Yes',
+                              recommendation: imageData.comments,
+                              imgUrl: imageData.url,
+                              quickImageUrl: imageData.responseImage,
+                              status: widget.status);
                         },
                       ),
                     ),
@@ -151,6 +151,7 @@ class HistoryDetailsCard extends StatelessWidget {
   final String recommendation;
   final String imgUrl;
   final RecommendationStatus status;
+  final String quickImageUrl;
 
   const HistoryDetailsCard(
       {this.position,
@@ -158,7 +159,8 @@ class HistoryDetailsCard extends StatelessWidget {
       this.isFilling,
       this.recommendation,
       this.imgUrl,
-      this.status});
+      this.status,
+      this.quickImageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -202,6 +204,88 @@ class HistoryDetailsCard extends StatelessWidget {
                                   position,
                                   style: GoogleFonts.sourceSansPro(
                                       fontSize: 24.0, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 4.0,
+                          top: 4.0,
+                          child: InkWell(
+                            onTap: () {
+                              showGeneralDialog(
+                                context: context,
+                                barrierColor: Colors.black12
+                                    .withOpacity(0.6), // background color
+                                barrierDismissible:
+                                    false, // should dialog be dismissed when tapped outside
+                                barrierLabel: "Dialog", // label for barrier
+                                transitionDuration: Duration(
+                                    milliseconds:
+                                        400), // how long it takes to popup dialog after button click
+                                pageBuilder: (_, __, ___) {
+                                  // your widget implementation
+                                  return SizedBox.expand(
+                                    // makes widget fullscreen
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 32.0,
+                                            ),
+                                          ),
+                                        ),
+                                        AspectRatio(
+                                          aspectRatio: 1 / 1,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Image.network(
+                                              quickImageUrl,
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16.0)),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 2.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      FontAwesome.info,
+                                      size: 14.0,
+                                    ),
+                                    SizedBox(
+                                      width: 4.0,
+                                    ),
+                                    Text(
+                                      'Instant AI Review',
+                                      style: GoogleFonts.sourceSansPro(
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -308,7 +392,7 @@ class PendingApprovalIndicator extends StatelessWidget {
               width: 16.0,
             ),
             Text(
-              'Pending For Review',
+              'Pending For Expert Review',
               style: GoogleFonts.sourceSansPro(
                   color: Colors.orange, fontSize: 16.0),
             ),

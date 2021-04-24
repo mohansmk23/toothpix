@@ -2,17 +2,23 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:confetti/confetti.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
+import 'package:toothpix/response_models/image_upload_model.dart';
 import 'package:toothpix/response_models/video.dart';
-import 'package:toothpix/widgets/solid_color_button.dart';
+import 'package:toothpix/screens/quick_results_screen.dart';
 import 'package:toothpix/widgets/video_thumbnail.dart';
 
 class ThankYouScreen extends StatefulWidget {
   static const routeName = "/thankyou";
+  final UploadImageResponse response;
+
+  const ThankYouScreen({this.response});
+
   @override
   _ThankYouScreenState createState() => _ThankYouScreenState();
 }
@@ -104,13 +110,20 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       child: Center(
-                        child: Text(
-                          'Checkout your results after 24 hours',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.roboto(
-                              color: Colors.black45,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Checkout your results after 24 hours',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.roboto(
+                                  color: Colors.black45,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            SizedBox(
+                              height: 16.0,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -198,13 +211,41 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
-                          child: SolidColorButton(
-                            buttonColor: Theme.of(context).primaryColor,
-                            textColor: Colors.white,
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            btnText: 'Go to Home',
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        primary:
+                                            Theme.of(context).primaryColor),
+                                    child: Text('Go to Home')),
+                              ),
+                              SizedBox(
+                                width: 4.0,
+                              ),
+                              Expanded(
+                                child: OutlinedButton(
+                                  child: Text('See Instant Review'),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            QuickResults(
+                                          response: widget.response,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          color:
+                                              Theme.of(context).primaryColor)),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       )

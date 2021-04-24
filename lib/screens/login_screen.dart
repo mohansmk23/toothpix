@@ -8,6 +8,8 @@ import 'package:toothpix/connection/connection.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
 import 'package:toothpix/response_models/login_model.dart';
 import 'package:toothpix/screens/dashboard_screen.dart';
+import 'package:toothpix/screens/forgot_password_screen.dart';
+import 'package:toothpix/screens/new_password_screen.dart';
 import 'package:toothpix/screens/signup_screen.dart';
 import 'package:toothpix/widgets/login_container.dart';
 import 'package:toothpix/widgets/login_outline_button.dart';
@@ -21,6 +23,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String userName, passWord;
+  TextEditingController userNameController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
   LoginResponse loginResponse;
@@ -45,18 +49,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (loginResponse.status == 'success') {
         SharedPreferences preferences = await SharedPreferences.getInstance();
-        preferences.setString(fName, loginResponse.firstName);
-        preferences.setString(lName, loginResponse.lastName);
-        preferences.setString(gender, loginResponse.gender);
-        preferences.setInt(age, loginResponse.age);
-        preferences.setString(phoneNo, loginResponse.mobileNumber);
-        preferences.setString(emailId, loginResponse.emailId);
-        preferences.setString(authkey, loginResponse.authKey);
-        preferences.setString(profileImgUrl, loginResponse.profileUrl);
-        preferences.setBool(isLoggedIn, true);
 
-        Navigator.pushNamedAndRemoveUntil(
-            context, Dashboard.routeName, (route) => false);
+        if (loginResponse.isTempPassword == 'yes') {
+          preferences.setString(authkey, loginResponse.authKey);
+          Navigator.pushNamed(context, NewPasswordScreen.routeName);
+
+          userNameController.text = '';
+          passwordController.text = '';
+        } else {
+          preferences.setString(fName, loginResponse.firstName);
+          preferences.setString(lName, loginResponse.lastName);
+          preferences.setString(gender, loginResponse.gender);
+          preferences.setInt(age, loginResponse.age);
+          preferences.setString(phoneNo, loginResponse.mobileNumber);
+          preferences.setString(emailId, loginResponse.emailId);
+          preferences.setString(authkey, loginResponse.authKey);
+          preferences.setString(profileImgUrl, loginResponse.profileUrl);
+          preferences.setBool(isLoggedIn, true);
+
+          Navigator.pushNamedAndRemoveUntil(
+              context, Dashboard.routeName, (route) => false);
+        }
       } else {
         _showSnackBar('Invalid Credentials');
       }
@@ -91,6 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         prefixIcon: FontAwesome.envelope_o,
                         hint: 'Email ID',
                         isPassword: false,
+                        controller: userNameController,
                         inputType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value.isEmpty) {
@@ -109,6 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         hint: 'Password',
                         inputType: TextInputType.visiblePassword,
                         isPassword: true,
+                        controller: passwordController,
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'Enter valid Password';
@@ -121,12 +136,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 8.0,
                       ),
-                      Text(
-                        'Forgot Password?',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
+                      InkWell(
+                        onTap: () {
+                          userNameController.text = '';
+                          passwordController.text = '';
+                          Navigator.pushNamed(
+                              context, ForgotPasswordScreen.routeName);
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -244,7 +267,7 @@ class LoginFormField extends StatefulWidget {
   const LoginFormField(
       {this.hint,
       this.prefixIcon,
-      this.isPassword,
+      this.isPassword = false,
       this.validator,
       this.controller,
       this.isAge = false,

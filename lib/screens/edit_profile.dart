@@ -234,7 +234,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         preferences.setInt(age, int.parse(ageController.text));
         preferences.setString(phoneNo, mobileNoController.text);
         preferences.setString(emailId, emailIdController.text);
-
         strFName = fNameController.text;
         strLName = lNameController.text;
         strAge = ageController.text;
@@ -266,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return null;
   }
 
-  String setGender(String gender) {
+  void setGender(String gender) {
     if (gender == 'Male') {
       selectedGender = [true, false, false];
     } else if (gender == 'Female') {

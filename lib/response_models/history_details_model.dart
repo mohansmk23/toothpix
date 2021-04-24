@@ -32,6 +32,7 @@ class ImageDetails {
   String label;
   String comments;
   String createdAt;
+  String responseImage;
 
   ImageDetails(
       {this.imagePosition,
@@ -40,7 +41,8 @@ class ImageDetails {
       this.brokenFiling,
       this.label,
       this.comments,
-      this.createdAt});
+      this.createdAt,
+      this.responseImage});
 
   ImageDetails.fromJson(Map<String, dynamic> json) {
     imagePosition = json['image_position'];
@@ -50,6 +52,7 @@ class ImageDetails {
     label = json['label'];
     comments = json['comments'];
     createdAt = json['created_at'];
+    responseImage = json['responseImage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -61,6 +64,7 @@ class ImageDetails {
     data['label'] = this.label;
     data['comments'] = this.comments;
     data['created_at'] = this.createdAt;
+    data['responseImage'] = this.responseImage;
     return data;
   }
 }

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toothpix/backend/api_urls.dart';
 import 'package:toothpix/connection/connection.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
+import 'package:toothpix/response_models/image_upload_model.dart';
 import 'package:toothpix/screens/dashboard_screen.dart';
 import 'package:toothpix/screens/thank_you.dart';
 
@@ -30,6 +31,7 @@ class _UploadLoaderState extends State<UploadLoader>
   bool _isLoading = false;
   bool uploadSuccess = false;
   bool uploadFailure = false;
+  UploadImageResponse uploadImageResponse;
 
   AnimationController _uploadIconAnimationController;
   Animation _uploadIconAnimation;
@@ -62,8 +64,10 @@ class _UploadLoaderState extends State<UploadLoader>
       final response = await getDio(key: preferences.getString(authkey))
           .post(uploadImage, data: formData);
       final Map<String, dynamic> parsed = json.decode(response.data);
+      uploadImageResponse =
+          UploadImageResponse.fromJson(json.decode(response.data));
 
-      if (parsed['status'] == 'success') {
+      if (uploadImageResponse.status == 'success') {
         setState(() {
           uploadFailure = false;
           uploadSuccess = true;
@@ -73,7 +77,10 @@ class _UploadLoaderState extends State<UploadLoader>
         _successIconAnimationController.forward().whenComplete(() {
           Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => ThankYouScreen()),
+              MaterialPageRoute(
+                  builder: (context) => ThankYouScreen(
+                        response: uploadImageResponse,
+                      )),
               ModalRoute.withName(Dashboard.routeName));
         });
       } else {

@@ -72,6 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     getHistory();
+    super.initState();
   }
 
   @override

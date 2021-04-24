@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 BaseOptions options;
-String url = "https://dev.hirephpcoder.com/toothpix/api/web/v1/"; //live
+String url =
+    "https://dev.hirephpcoder.com/toothpix/toothpix2/api/web/v1/"; //live
 String commonAuth = "638a02b2-0ebc-4996-9e05-2b52d5f1b157";
 
 Dio getDio({String key}) {
