@@ -2,8 +2,10 @@ class UploadImageResponse {
   String status;
   String message;
   ImageResponse imageResponse;
+  var enquiryId;
 
-  UploadImageResponse({this.status, this.message, this.imageResponse});
+  UploadImageResponse(
+      {this.status, this.message, this.imageResponse, this.enquiryId});
 
   UploadImageResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -11,6 +13,7 @@ class UploadImageResponse {
     imageResponse = json['imageResponse'] != null
         ? new ImageResponse.fromJson(json['imageResponse'])
         : null;
+    enquiryId = json['enquiryId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -20,6 +23,7 @@ class UploadImageResponse {
     if (this.imageResponse != null) {
       data['imageResponse'] = this.imageResponse.toJson();
     }
+    data['enquiryId'] = this.enquiryId;
     return data;
   }
 }
@@ -70,13 +74,19 @@ class TopLeft {
   String imageType;
   String orginalImageUrl;
   String responseImage;
+  String isDetected;
 
-  TopLeft({this.imageType, this.orginalImageUrl, this.responseImage});
+  TopLeft(
+      {this.imageType,
+      this.orginalImageUrl,
+      this.responseImage,
+      this.isDetected});
 
   TopLeft.fromJson(Map<String, dynamic> json) {
     imageType = json['imageType'];
     orginalImageUrl = json['orginalImageUrl'];
     responseImage = json['responseImage'];
+    isDetected = json['isDetected'];
   }
 
   Map<String, dynamic> toJson() {
@@ -84,6 +94,7 @@ class TopLeft {
     data['imageType'] = this.imageType;
     data['orginalImageUrl'] = this.orginalImageUrl;
     data['responseImage'] = this.responseImage;
+    data['isDetected'] = this.isDetected;
     return data;
   }
 }

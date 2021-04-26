@@ -1,15 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toothpix/app/widget_constants.dart';
 import 'package:toothpix/backend/api_urls.dart';
 import 'package:toothpix/connection/connection.dart';
 import 'package:toothpix/constants/sharedPrefKeys.dart';
 import 'package:toothpix/response_models/history_details_model.dart';
+import 'package:toothpix/screens/quick_results_screen.dart';
 import 'package:toothpix/widgets/historyCard.dart';
 import 'package:toothpix/widgets/history_date_card.dart';
 
@@ -96,6 +95,33 @@ class _HistoryDetailsState extends State<HistoryDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          List<String> response = [];
+
+          response.add(widget.id);
+          response.add(historyDetailsResponse.imageDetails[0].url);
+          response.add(historyDetailsResponse.imageDetails[1].url);
+          response.add(historyDetailsResponse.imageDetails[2].url);
+          response.add(historyDetailsResponse.imageDetails[3].url);
+
+          var result = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => QuickResults(
+                response: response,
+              ),
+            ),
+          );
+
+          if (result != null && result) {
+            _showSnackBar('something went wrong');
+          }
+        },
+        label: Text(
+          'Instant AI Review',
+        ),
+        icon: Icon(Icons.lightbulb_outline),
+      ),
       appBar: AppBar(
         title: Text('ToothPix'),
       ),
@@ -167,12 +193,10 @@ class HistoryDetailsCard extends StatelessWidget {
     final _scrollController = ScrollController();
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
-          boxShadow: neumorphicShadow,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -209,88 +233,88 @@ class HistoryDetailsCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Positioned(
-                          left: 4.0,
-                          top: 4.0,
-                          child: InkWell(
-                            onTap: () {
-                              showGeneralDialog(
-                                context: context,
-                                barrierColor: Colors.black12
-                                    .withOpacity(0.6), // background color
-                                barrierDismissible:
-                                    false, // should dialog be dismissed when tapped outside
-                                barrierLabel: "Dialog", // label for barrier
-                                transitionDuration: Duration(
-                                    milliseconds:
-                                        400), // how long it takes to popup dialog after button click
-                                pageBuilder: (_, __, ___) {
-                                  // your widget implementation
-                                  return SizedBox.expand(
-                                    // makes widget fullscreen
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: <Widget>[
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Icon(
-                                              Icons.close,
-                                              color: Colors.white,
-                                              size: 32.0,
-                                            ),
-                                          ),
-                                        ),
-                                        AspectRatio(
-                                          aspectRatio: 1 / 1,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Image.network(
-                                              quickImageUrl,
-                                              fit: BoxFit.fill,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.0)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 2.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      FontAwesome.info,
-                                      size: 14.0,
-                                    ),
-                                    SizedBox(
-                                      width: 4.0,
-                                    ),
-                                    Text(
-                                      'Instant AI Review',
-                                      style: GoogleFonts.sourceSansPro(
-                                          fontSize: 12.0,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
+                        // Positioned(
+                        //   left: 4.0,
+                        //   top: 4.0,
+                        //   child: InkWell(
+                        //     onTap: () {
+                        //       showGeneralDialog(
+                        //         context: context,
+                        //         barrierColor: Colors.black12
+                        //             .withOpacity(0.6), // background color
+                        //         barrierDismissible:
+                        //             false, // should dialog be dismissed when tapped outside
+                        //         barrierLabel: "Dialog", // label for barrier
+                        //         transitionDuration: Duration(
+                        //             milliseconds:
+                        //                 400), // how long it takes to popup dialog after button click
+                        //         pageBuilder: (_, __, ___) {
+                        //           // your widget implementation
+                        //           return SizedBox.expand(
+                        //             // makes widget fullscreen
+                        //             child: Column(
+                        //               mainAxisAlignment:
+                        //                   MainAxisAlignment.center,
+                        //               crossAxisAlignment:
+                        //                   CrossAxisAlignment.end,
+                        //               children: <Widget>[
+                        //                 GestureDetector(
+                        //                   onTap: () {
+                        //                     Navigator.pop(context);
+                        //                   },
+                        //                   child: Padding(
+                        //                     padding: const EdgeInsets.all(16.0),
+                        //                     child: Icon(
+                        //                       Icons.close,
+                        //                       color: Colors.white,
+                        //                       size: 32.0,
+                        //                     ),
+                        //                   ),
+                        //                 ),
+                        //                 AspectRatio(
+                        //                   aspectRatio: 1 / 1,
+                        //                   child: Padding(
+                        //                     padding: const EdgeInsets.all(16.0),
+                        //                     child: Image.network(
+                        //                       quickImageUrl,
+                        //                       fit: BoxFit.fill,
+                        //                     ),
+                        //                   ),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //           );
+                        //         },
+                        //       );
+                        //     },
+                        //     child: Card(
+                        //       shape: RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.circular(16.0)),
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.symmetric(
+                        //             horizontal: 8.0, vertical: 2.0),
+                        //         child: Row(
+                        //           mainAxisSize: MainAxisSize.min,
+                        //           children: [
+                        //             Icon(
+                        //               FontAwesome.info,
+                        //               size: 14.0,
+                        //             ),
+                        //             SizedBox(
+                        //               width: 4.0,
+                        //             ),
+                        //             Text(
+                        //               'Instant AI Review',
+                        //               style: GoogleFonts.sourceSansPro(
+                        //                   fontSize: 12.0,
+                        //                   fontWeight: FontWeight.w600),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ))),
             SizedBox(

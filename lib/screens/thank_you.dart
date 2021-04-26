@@ -30,6 +30,13 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
   VideoResponse videoDetails;
   bool _isLoading = false;
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
   getVideoResponse() async {
     setState(() {
       _isLoading = true;
@@ -229,15 +236,32 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                               Expanded(
                                 child: OutlinedButton(
                                   child: Text('See Instant Review'),
-                                  onPressed: () {
-                                    Navigator.of(context).push(
+                                  onPressed: () async {
+                                    List<String> response = [];
+
+                                    response.add(widget.response.enquiryId);
+                                    response.add(widget.response.imageResponse
+                                        .topLeft.orginalImageUrl);
+                                    response.add(widget.response.imageResponse
+                                        .topRight.orginalImageUrl);
+                                    response.add(widget.response.imageResponse
+                                        .bottomLeft.orginalImageUrl);
+                                    response.add(widget.response.imageResponse
+                                        .bottomRight.orginalImageUrl);
+
+                                    var result =
+                                        await Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (BuildContext context) =>
                                             QuickResults(
-                                          response: widget.response,
+                                          response: response,
                                         ),
                                       ),
                                     );
+
+                                    if (result != null && result) {
+                                      _showSnackBar('something went wrong');
+                                    }
                                   },
                                   style: OutlinedButton.styleFrom(
                                       side: BorderSide(

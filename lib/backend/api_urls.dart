@@ -8,3 +8,4 @@ const String editProfile = 'registerupdate';
 const String changeProfilePic = 'profilepicture';
 const String forgot = 'forgot';
 const String newPassword = 'change-password';
+const String quickResult = 'image-prediction';
