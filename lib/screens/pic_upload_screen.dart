@@ -203,7 +203,7 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text('Take a ToothPix'),
+          title: Text('Take a ToothSnap'),
         ),
         body: _isLoading
             ? Center(

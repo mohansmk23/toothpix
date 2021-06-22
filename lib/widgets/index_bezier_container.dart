@@ -16,7 +16,7 @@ class BezierContainer extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'ToothPix',
+              'ToothSnap',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 16.0,

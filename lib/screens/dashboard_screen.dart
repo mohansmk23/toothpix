@@ -136,7 +136,7 @@ class _DashboardState extends State<Dashboard> {
         key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text('ToothPix'),
+          title: Text('ToothSnap'),
           leading: InkWell(
               onTap: () {
                 _toggle();
@@ -315,7 +315,7 @@ class _DashboardState extends State<Dashboard> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 18.0, vertical: 24.0),
                                       child: Text(
-                                        'Take a ToothPix',
+                                        'Take a Toothsnap',
                                         style: GoogleFonts.roboto(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w600,
@@ -391,7 +391,7 @@ class _DashboardState extends State<Dashboard> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 18.0, vertical: 24.0),
                                         child: Text(
-                                          'History of ToothPix',
+                                          'History of ToothSnap',
                                           style: GoogleFonts.roboto(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w600,
@@ -453,7 +453,7 @@ class _DashboardState extends State<Dashboard> {
               Divider(
                 color: Colors.white54,
               ),
-              _navigationMenuItem(Icons.camera, 'Take a ToothPix', () async {
+              _navigationMenuItem(Icons.camera, 'Take a ToothSnap', () async {
                 _toggle();
 
                 showDialog(

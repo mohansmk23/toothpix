@@ -82,7 +82,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text('History of ToothPix'),
+          title: Text('History of ToothSnap'),
           bottom: TabBar(
             indicator: CircleTabIndicator(color: Colors.white, radius: 3),
             unselectedLabelColor: Colors.grey[350],
@@ -142,13 +142,13 @@ class HistoryEmptyState extends StatelessWidget {
   String getEmptyStateHeadText(RecommendationStatus status) {
     switch (status) {
       case RecommendationStatus.all:
-        return 'No ToothPix Available';
+        return 'No ToothSnap Available';
         break;
       case RecommendationStatus.recommended:
-        return 'No Recommended ToothPix';
+        return 'No Recommended ToothSnap';
         break;
       case RecommendationStatus.pending:
-        return 'No Pending ToothPix';
+        return 'No Pending ToothSnap';
         break;
     }
   }
@@ -156,13 +156,13 @@ class HistoryEmptyState extends StatelessWidget {
   String getEmptyStateSubText(RecommendationStatus status) {
     switch (status) {
       case RecommendationStatus.all:
-        return 'Take new ToothPix to See Results';
+        return 'Take new ToothSnap to See Results';
         break;
       case RecommendationStatus.recommended:
         return 'Check This Space Later';
         break;
       case RecommendationStatus.pending:
-        return 'Take new ToothPix to See Results';
+        return 'Take new ToothSnap to See Results';
         break;
     }
   }
