@@ -51,13 +51,13 @@ class _UploadLoaderState extends State<UploadLoader>
     });
     FormData formData = FormData.fromMap({
       "Top_Left": await MultipartFile.fromFile(widget.upperLeft.path,
-          filename: "topleft.txt"),
+          filename: "topleft.jpeg"),
       "Top_Right": await MultipartFile.fromFile(widget.upperRight.path,
-          filename: "topright.txt"),
+          filename: "topright.jpeg"),
       "Bottom_Left": await MultipartFile.fromFile(widget.lowerLeft.path,
-          filename: "bottomleft.txt"),
+          filename: "bottomleft.jpeg"),
       "Bottom_Right": await MultipartFile.fromFile(widget.lowerRight.path,
-          filename: "bottomright.txt")
+          filename: "bottomright.jpeg")
     });
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();

@@ -39,8 +39,9 @@ class _QuickResultsState extends State<QuickResults> {
       final Map<String, dynamic> parsed = json.decode(response.data);
 
       if (_predictionModel.status == 'success') {
-        print('ssdsd');
-        //Navigator.pop(context, true);
+        setState(() {
+          _isLoading = false;
+        });
       } else {
         print('fffff');
         Navigator.pop(context, true);
@@ -49,10 +50,6 @@ class _QuickResultsState extends State<QuickResults> {
       print('eeeee');
       Navigator.pop(context, true);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -121,7 +118,7 @@ class _QuickResultsState extends State<QuickResults> {
                               height: 8.0,
                             ),
                             Text(
-                              'See the instant review from our AI System. Our doctors will give their expert review in 24 hrs.',
+                              'This is an auto review from our AI system. Our doctors will give their expert reviews separately.',
                               style: GoogleFonts.sourceSansPro(
                                 fontSize: 16.0,
                                 color: Colors.white,
@@ -148,7 +145,7 @@ class _QuickResultsState extends State<QuickResults> {
                                 width: 16.0,
                               ),
                               Text(
-                                'Scanning your results.',
+                                'Processing your results.',
                                 style: GoogleFonts.sourceSansPro(
                                     fontSize: 20.0,
                                     color: Colors.white,
@@ -297,27 +294,31 @@ class _QuickResultsItemState extends State<QuickResultsItem>
                   visible: !widget.isDetected,
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.green),
-                          borderRadius: BorderRadius.circular(24.0)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: Colors.green,
-                            ),
-                            SizedBox(
-                              width: 8.0,
-                            ),
-                            Text(
-                              'No problem detected by our AI system',
-                              style: TextStyle(color: Colors.green),
-                            ),
-                          ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.green),
+                            borderRadius: BorderRadius.circular(24.0)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.green,
+                              ),
+                              SizedBox(
+                                width: 4.0,
+                              ),
+                              Text(
+                                'No broken filling / cavity detected by our AI system',
+                                style: TextStyle(
+                                    color: Colors.green, fontSize: 12.0),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
