@@ -335,7 +335,7 @@ class _PicUploadscreenState extends State<PicUploadscreen> {
                             _showSnackBar('Please Capture All 4 images');
                           }
                         },
-                        btnText: 'Get General Advise',
+                        btnText: 'See Instant AI Review',
                       ),
                     )
                   ],
